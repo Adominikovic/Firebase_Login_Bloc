@@ -3,7 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleSignInProvider {
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn;
+
+  GoogleSignInProvider(this._googleSignIn);
 
   Future<AuthCredential> googleLogIn() async {
     GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
