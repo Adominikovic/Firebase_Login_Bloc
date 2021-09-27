@@ -31,7 +31,7 @@ class AuthenticationBloc
       try {
         yield AuthenticationLoading();
         authDetailsStream = _authenticationRepository
-            .getUserAuthDetails()
+            .getAuthDetailStream()
             .listen((authDetails) {
           add(
             AuthenticationStateChange(authDetails),
@@ -65,7 +65,7 @@ class AuthenticationBloc
     } else if (event is AuthenticationEnded) {
       try {
         yield AuthenticationLoading();
-        await _authenticationRepository.logoutUser();
+        await _authenticationRepository.unAuthenticate();
       } catch (error) {
         print('Error has occurred during logout: ${error.toString()}');
         yield AuthenticationFailed('Logout failed.');

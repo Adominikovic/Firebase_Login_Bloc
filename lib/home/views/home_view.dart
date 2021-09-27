@@ -10,7 +10,7 @@ class HomeView extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Login Page'),
+          title: Text('Home Page'),
           actions: [
             IconButton(
               icon: Icon(Icons.exit_to_app),

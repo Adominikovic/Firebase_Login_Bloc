@@ -4,33 +4,42 @@ import 'package:firebase_login/authentication/data/providers/google_sign_in_prov
 import 'package:firebase_login/authentication/models/user_auth_details.dart';
 
 class AuthenticationRepository {
-  final FirebaseAuthenticationProvider _firebaseAuthenticationProvider;
+  final FirebaseAuthenticationProvider _authenticationFirebaseProvider;
   final GoogleSignInProvider _googleSignInProvider;
 
   AuthenticationRepository(
-      this._firebaseAuthenticationProvider, this._googleSignInProvider);
+      this._authenticationFirebaseProvider, this._googleSignInProvider);
 
-  UserAuthDetails _getFirebaseCredential(User user) {
-    UserAuthDetails details;
-    details = UserAuthDetails(
-        true, user.uid, user.photoURL, user.displayName, user.email);
-    return details;
-  }
-
-  Stream<UserAuthDetails> getUserAuthDetails() {
-    return _firebaseAuthenticationProvider
-        .getAuthStates()
-        .map((user) => _getFirebaseCredential(user!));
+  Stream<UserAuthDetails> getAuthDetailStream() {
+    return _authenticationFirebaseProvider.getAuthStates().map((user) {
+      return _getAuthCredentialFromFirebaseUser(user: user);
+    });
   }
 
   Future<UserAuthDetails> getCredentialWithGoogle() async {
-    User? user = await _firebaseAuthenticationProvider
+    User? user = await _authenticationFirebaseProvider
         .firebaseLogin(await _googleSignInProvider.googleLogIn());
-    return _getFirebaseCredential(user!);
+    return _getAuthCredentialFromFirebaseUser(user: user);
   }
 
-  Future<void> logoutUser() async {
+  Future<void> unAuthenticate() async {
     await _googleSignInProvider.googleLogOut();
-    await _firebaseAuthenticationProvider.firebaseLogout();
+    await _authenticationFirebaseProvider.firebaseLogout();
+  }
+
+  UserAuthDetails _getAuthCredentialFromFirebaseUser({required User? user}) {
+    UserAuthDetails authDetail;
+    if (user != null) {
+      authDetail = UserAuthDetails(
+        true,
+        user.uid,
+        user.email,
+        user.photoURL,
+        user.displayName,
+      );
+    } else {
+      authDetail = UserAuthDetails(false, '', '', '', '');
+    }
+    return authDetail;
   }
 }
